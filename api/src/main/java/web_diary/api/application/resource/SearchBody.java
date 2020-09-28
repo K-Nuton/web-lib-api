@@ -3,13 +3,13 @@ package web_diary.api.application.resource;
 import web_diary.api.DateTimeLite;
 import web_diary.api.domain.model.Diary;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class SearchBody {
 
-  @NotBlank
+  @NotNull
   private Integer inner_user_id;
 
   private String date;
