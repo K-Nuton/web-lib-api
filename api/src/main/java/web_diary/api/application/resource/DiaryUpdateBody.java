@@ -2,6 +2,8 @@ package web_diary.api.application.resource;
 
 import web_diary.api.domain.model.Diary;
 
+import java.time.LocalDateTime;
+
 import javax.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -27,7 +29,7 @@ public class DiaryUpdateBody {
     boolean err = true;
     if (this.date != null) {
       err = false;
-      result.setDate(this.date);
+      result.setDate(LocalDateTime.parse(this.date));
     }
     if (this.wheather != null) {
       err = false;

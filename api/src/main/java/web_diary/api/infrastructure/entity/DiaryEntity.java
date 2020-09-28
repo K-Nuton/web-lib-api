@@ -1,6 +1,5 @@
 package web_diary.api.infrastructure.entity;
 
-import web_diary.api.DateTimeLite;
 import web_diary.api.domain.model.Diary;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Data
@@ -17,8 +17,8 @@ import java.util.Map;
 public class DiaryEntity {
   private Integer inner_user_id;
   private Integer diary_id;
-  private String date;
-  private String update_date;
+  private LocalDateTime date;
+  private LocalDateTime update_date;
   private Integer wheather;
   private Integer feeling;
   private String text;
@@ -35,8 +35,8 @@ public class DiaryEntity {
     return DiaryEntity.builder()
       .inner_user_id((Integer) result.get(INNER_USER_ID))
       .diary_id((Integer) result.get(DIARY_ID))
-      .date(DateTimeLite.getInstance().setTimestamp((Timestamp) result.get(DATE)).toString())
-      .update_date(DateTimeLite.getInstance().setTimestamp((Timestamp) result.get(UPDATE_DATE)).toString())
+      .date(((Timestamp) result.get(DATE)).toLocalDateTime())
+      .update_date(((Timestamp) result.get(UPDATE_DATE)).toLocalDateTime())
       .wheather((Integer) result.get(WHEATHER))
       .feeling((Integer) result.get(FEELING))
       .text((String) result.get(TEXT))

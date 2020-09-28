@@ -2,6 +2,8 @@ package web_diary.api.application.resource;
 
 import web_diary.api.domain.model.Diary;
 
+import java.time.LocalDateTime;
+
 import javax.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -25,7 +27,7 @@ public class DiaryBody {
   public Diary to_domain_diary() {
     return Diary.builder()
     .inner_user_id(this.inner_user_id)
-    .date(this.date)
+    .date(LocalDateTime.parse(this.date))
     .wheather(this.wheather)
     .feeling(this.feeling)
     .text(this.text)

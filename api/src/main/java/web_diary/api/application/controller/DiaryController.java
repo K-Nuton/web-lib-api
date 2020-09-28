@@ -3,13 +3,13 @@ package web_diary.api.application.controller;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import web_diary.api.DateTimeLite;
 import web_diary.api.application.resource.DiaryBody;
 import web_diary.api.application.resource.DiaryUpdateBody;
 import web_diary.api.application.resource.SearchBody;
 import web_diary.api.domain.model.Diary;
 import web_diary.api.domain.service.DiaryService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -47,7 +47,7 @@ public class DiaryController {
     return this.diaryService.find_by_multi_condition(
       searchBody.to_domain_diary(), 
       Diary.builder()
-      .date(DateTimeLite.getInstance().parse(limit_date).toString())
+      .date(LocalDateTime.parse(limit_date))
       .build()
     );
   }

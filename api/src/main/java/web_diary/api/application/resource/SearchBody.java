@@ -1,7 +1,8 @@
 package web_diary.api.application.resource;
 
-import web_diary.api.DateTimeLite;
 import web_diary.api.domain.model.Diary;
+
+import java.time.LocalDateTime;
 
 import javax.validation.constraints.NotNull;
 import lombok.Data;
@@ -30,7 +31,7 @@ public class SearchBody {
     boolean err = true;
     if (this.date != null) {
       err = false;
-      result.setDate(DateTimeLite.getInstance().parse(this.date).toString());
+      result.setDate(LocalDateTime.parse(this.date));
     }
     if (this.wheather != null) {
       err = false;
@@ -59,7 +60,7 @@ public class SearchBody {
     }
 
     if (this.end_date != null) {
-      result.setDate(DateTimeLite.getInstance().parse(this.end_date).toString());
+      result.setDate(LocalDateTime.parse(this.end_date));
     }
     return result;
   }
