@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.transaction.annotation.Transactional;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,7 +51,6 @@ public class DiaryController {
     );
   }
 
-  @Transactional
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public Diary insert(@RequestBody @Validated DiaryBody diaryBody, BindingResult result) {
@@ -62,7 +60,6 @@ public class DiaryController {
     return this.diaryService.insert(diaryBody.to_domain_diary());
   }
 
-  @Transactional
   @PutMapping
   @ResponseStatus(HttpStatus.OK)
   public Diary update(@RequestBody DiaryUpdateBody diarybody, BindingResult result) {
@@ -72,7 +69,6 @@ public class DiaryController {
     return this.diaryService.update(diarybody.to_domain_diary());
   }
 
-  @Transactional
   @DeleteMapping("{diary_id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete_diary_by_diary_id(@PathVariable("diary_id") Integer diary_id) {

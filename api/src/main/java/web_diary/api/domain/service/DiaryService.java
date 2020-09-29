@@ -5,6 +5,7 @@ import web_diary.api.domain.repository.DiaryRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,14 +27,17 @@ public class DiaryService {
     return this.diaryRepository.find_by_multi_condition(diary, end);
   }
 
+  @Transactional
   public Diary insert(Diary diary) {
     return this.diaryRepository.insert(diary);
   }
 
+  @Transactional
   public Diary update(Diary diary) {
     return this.diaryRepository.update(diary);
   }
 
+  @Transactional
   public void delete_diary_by_diary_id(Integer diary_id) {
     this.diaryRepository.delete_diary_by_diary_id(diary_id);
   }
