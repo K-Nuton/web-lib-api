@@ -3,15 +3,13 @@ package web_diary.api.application.resource;
 import web_diary.api.domain.model.Diary;
 
 import java.time.LocalDateTime;
-
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class DiaryUpdateBody {
-
-  @NotBlank
-  private Integer diary_id = 0;
+  @NotNull
+  private Integer diary_id;
 
   private String date;
 

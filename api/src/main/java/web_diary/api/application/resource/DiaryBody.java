@@ -4,24 +4,25 @@ import web_diary.api.domain.model.Diary;
 
 import java.time.LocalDateTime;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 import lombok.Data;
 
 @Data
 public class DiaryBody {
-  @NotBlank
+  @NotNull
   private Integer inner_user_id;
   
-  @NotBlank
+  @NotNull
   private String date;
   
-  @NotBlank
+  @NotNull
   private Integer wheather;
   
-  @NotBlank
+  @NotNull
   private Integer feeling;
   
-  @NotBlank
+  @NotNull
   private String text;
 
   public Diary to_domain_diary() {
