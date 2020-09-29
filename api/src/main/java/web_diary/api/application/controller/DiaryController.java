@@ -3,8 +3,8 @@ package web_diary.api.application.controller;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import web_diary.api.application.resource.DiaryBody;
-import web_diary.api.application.resource.DiaryUpdateBody;
+import web_diary.api.application.resource.input_body.DiaryBody;
+import web_diary.api.application.resource.input_body.DiaryUpdateBody;
 import web_diary.api.domain.model.Diary;
 import web_diary.api.domain.service.DiaryService;
 

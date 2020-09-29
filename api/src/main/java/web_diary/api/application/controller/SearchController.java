@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import web_diary.api.application.resource.SearchBody;
+import web_diary.api.application.resource.input_body.SearchBody;
 import web_diary.api.domain.model.Diary;
 import web_diary.api.domain.service.DiaryService;
 

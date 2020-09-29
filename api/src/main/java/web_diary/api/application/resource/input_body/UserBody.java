@@ -1,4 +1,4 @@
-package web_diary.api.application.resource;
+package web_diary.api.application.resource.input_body;
 
 import web_diary.api.domain.model.User;
 import lombok.Data;

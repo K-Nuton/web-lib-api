@@ -2,7 +2,7 @@ package web_diary.api.application.controller;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import web_diary.api.application.resource.UserBody;
+import web_diary.api.application.resource.input_body.UserBody;
 import web_diary.api.domain.model.User;
 import web_diary.api.domain.service.UserService;
 

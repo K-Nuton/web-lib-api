@@ -1,17 +1,21 @@
-package web_diary.api.application.resource;
+package web_diary.api.application.resource.input_body;
 
 import web_diary.api.domain.model.Diary;
 
 import java.time.LocalDateTime;
+
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class DiaryUpdateBody {
+public class SearchBody {
+
   @NotNull
-  private Integer diary_id;
+  private Integer inner_user_id;
 
   private String date;
+
+  private String end_date;
 
   private Integer wheather;
 
@@ -21,7 +25,7 @@ public class DiaryUpdateBody {
 
   public Diary to_domain_diary() throws RuntimeException {
     Diary result = Diary.builder()
-    .diary_id(this.diary_id)
+    .inner_user_id(this.inner_user_id)
     .build();
     
     boolean err = true;
@@ -43,9 +47,21 @@ public class DiaryUpdateBody {
     }
 
     if (err) {
-      throw new RuntimeException("日付, 天気, 気持ち, 本文 のいずれも更新対象になっていません。");
+      throw new RuntimeException("日付, 天気, 気持ち, 本文 のいずれも検索対象になっていません。");
     }
 
+    return result;
+  }
+
+  public Diary get_end_priod() throws RuntimeException {
+    Diary result = Diary.builder().build();
+    if (this.end_date == null && this.date != null) {
+      throw new RuntimeException("範囲検索をする場合は、検索終了位置: \"end_date\"を設定してください。");
+    }
+
+    if (this.end_date != null) {
+      result.setDate(LocalDateTime.parse(this.end_date));
+    }
     return result;
   }
 }
