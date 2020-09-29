@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.transaction.annotation.Transactional;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +25,6 @@ public class UserController {
     return this.userService.find_by_user_id(user_id);
   }
 
-  @Transactional
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public User insert(@Validated @RequestBody UserBody userBody, BindingResult result) {
@@ -37,7 +35,6 @@ public class UserController {
     return this.userService.insert(userBody.to_domain_user());
   }
 
-  @Transactional
   @PutMapping
   @ResponseStatus(HttpStatus.OK)
   public User update(@RequestBody @Validated UserBody userBody, BindingResult result) {
@@ -48,7 +45,6 @@ public class UserController {
     return this.userService.update(userBody.to_domain_user());
   }
 
-  @Transactional
   @DeleteMapping("{user_id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete_by_user_id(@PathVariable("user_id") String user_id) {
