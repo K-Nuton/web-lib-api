@@ -2,15 +2,14 @@ package web_diary.api.infrastructure;
 
 import web_diary.api.domain.model.User;
 import web_diary.api.domain.repository.UserRepository;
-import web_diary.api.infrastructure.entity.UserEntity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 
 import lombok.RequiredArgsConstructor;
-import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
@@ -43,15 +42,7 @@ public class UserRepositoryImpl implements UserRepository {
       INSERT2, user.getUser_id()
     );
 
-    Map<String, Object> result = jdbcTemplate.queryForMap(
-      SELECT, user.getUser_id()
-    );
-
-    return User.builder()
-    .inner_user_id((int) result.get("inner_user_id"))
-    .user_id((String) result.get("user_id"))
-    .user_name((String) result.get("user_name"))
-    .build();
+    return find_by_user_id(user.getUser_id());
   }
 
   @Override
@@ -60,26 +51,16 @@ public class UserRepositoryImpl implements UserRepository {
       UPDATE, user.getUser_name(), user.getUser_id()
     );
 
-    Map<String, Object> result = jdbcTemplate.queryForMap(
-      SELECT, user.getUser_id()
-    );
-
-    return User.builder()
-    .inner_user_id((int) result.get("inner_user_id"))
-    .user_id((String) result.get("user_id"))
-    .user_name((String) result.get("user_name"))
-    .build();
+    return find_by_user_id(user.getUser_id());
   }
 
   @Override
   public User find_by_user_id(String user_id) {
-    Map<String, Object> user_info = jdbcTemplate.queryForMap(
-      SELECT, user_id
+    return jdbcTemplate.queryForObject(
+      SELECT,
+      new BeanPropertyRowMapper<User>(User.class),
+      user_id
     );
-
-    return new UserEntity()
-    .set_result(user_info)
-    .get_domain_instance();
   }
 
   @Override
