@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import web_diary.api.application.resource.input_body.SearchBody;
+import web_diary.api.domain.exception.InvalidJsonValueException;
 import web_diary.api.domain.model.Diary;
 import web_diary.api.domain.service.DiaryService;
 
@@ -28,6 +29,9 @@ public class SearchController {
   @PostMapping()
   @ResponseStatus(HttpStatus.OK)
   public List<Diary> search(@RequestBody @Validated SearchBody searchBody, BindingResult result) {
+    if (result.hasErrors())
+      throw InvalidJsonValueException.getInstance(result);
+    
     return this.diaryService.find_by_multi_condition(
       searchBody.to_domain_diary(),
       searchBody.get_end_priod()

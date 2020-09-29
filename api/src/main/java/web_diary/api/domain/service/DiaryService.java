@@ -1,7 +1,9 @@
 package web_diary.api.domain.service;
 
+import web_diary.api.domain.exception.NotFoundException;
 import web_diary.api.domain.model.Diary;
 import web_diary.api.domain.repository.DiaryRepository;
+import web_diary.api.domain.repository.UserRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,16 @@ public class DiaryService {
   @NonNull
   private DiaryRepository diaryRepository;
 
+  @NonNull 
+  private UserRepository userRepository;
+
+  private final String REPLACE = "%%";
+  private final String USER_NOT_EXISTS = "user: %% does not exists.";
+
   public List<Diary> find_by_inner_user_id(Integer inner_user_id) {
+    if (!userRepository.user_exists(inner_user_id))
+      throw new NotFoundException(USER_NOT_EXISTS.replace(REPLACE, inner_user_id.toString()));
+
     return this.diaryRepository.find_by_inner_user_id(inner_user_id);
   }
 
@@ -29,6 +40,9 @@ public class DiaryService {
 
   @Transactional
   public Diary insert(Diary diary) {
+    if (!userRepository.user_exists(diary.getInner_user_id()))
+      throw new NotFoundException(USER_NOT_EXISTS.replace(REPLACE, diary.getInner_user_id().toString()));
+
     return this.diaryRepository.insert(diary);
   }
 

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 import web_diary.api.application.resource.input_body.DiaryBody;
 import web_diary.api.application.resource.input_body.DiaryUpdateBody;
+import web_diary.api.domain.exception.InvalidJsonValueException;
 import web_diary.api.domain.model.Diary;
 import web_diary.api.domain.service.DiaryService;
 
@@ -38,18 +39,18 @@ public class DiaryController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public Diary insert(@RequestBody @Validated DiaryBody diaryBody, BindingResult result) {
-    if (result.hasErrors()) {
-      throw new RuntimeException("入力値が不足しています。");
-    }
+    if (result.hasErrors())
+      throw InvalidJsonValueException.getInstance(result);
+
     return this.diaryService.insert(diaryBody.to_domain_diary());
   }
 
   @PutMapping
   @ResponseStatus(HttpStatus.OK)
-  public Diary update(@RequestBody DiaryUpdateBody diarybody, BindingResult result) {
-    if (result.hasErrors()) {
-      throw new RuntimeException("入力値が不足しています。");
-    }
+  public Diary update(@RequestBody @Validated DiaryUpdateBody diarybody, BindingResult result) {
+    if (result.hasErrors())
+      throw InvalidJsonValueException.getInstance(result);
+
     return this.diaryService.update(diarybody.to_domain_diary());
   }
 
