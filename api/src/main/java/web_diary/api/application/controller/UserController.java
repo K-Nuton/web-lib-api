@@ -35,10 +35,6 @@ public class UserController {
     }
 
     return this.userService.insert(userBody.to_domain_user());
-    // if (userBody.getUser_id() != null) {
-    //   throw new RuntimeException();
-    // }
-    // return result;
   }
 
   @Transactional
