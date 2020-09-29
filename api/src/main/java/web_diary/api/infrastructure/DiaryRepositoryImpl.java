@@ -2,17 +2,17 @@ package web_diary.api.infrastructure;
 
 import web_diary.api.domain.model.Diary;
 import web_diary.api.domain.repository.DiaryRepository;
-import web_diary.api.infrastructure.entity.DiaryEntity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 import lombok.RequiredArgsConstructor;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.math.BigInteger;
 
 @Repository
@@ -26,18 +26,32 @@ public class DiaryRepositoryImpl implements DiaryRepository {
                                     "wheather, feeling, text from diary inner join diary_link " + 
                                     "on diary.diary_id = diary_link.diary_id ";
 
-  private final String FIND_ALL_BY_INNER_USER_ID = INNER_JOIN + "where inner_user_id = ?";
+  private final String FIND_BY_INNER_USER_ID = INNER_JOIN + "where inner_user_id = ?";
+  private final String FIND_BY_DIARY_ID = INNER_JOIN + "where diary.diary_id = ?";
   
-  private final String FIND_BY_DIARY_ID = INNER_JOIN + "where diary.diary_id = ?";      
+  private final String UPDATE_SET = "update diary set ";
+  private final String WHERE_DIARY_ID = " where diary_id";
                                           
   private final String INSERT1 = "insert into diary_link (inner_user_id) values (?)";                                          
-
   private final String INSERT2 = "insert into diary (diary_id, date, wheather, feeling, text) " + 
                                  "values (?, ?, ?, ?, ?)";
 
+  private final String SELECT_LAST_INSERT_ID = "select last_insert_id()";
+  private final String LAST_INSERT_ID = "last_insert_id()";
+
   private final String DELETE = "delete diary, diary_link " +
                                 "from diary inner join diary_link on diary.diary_id = diary_link.diary_id " + 
-                                "where diary.diary_id = ?";                          
+                                "where diary.diary_id = ?";  
+  
+                                
+  private final String AND = " and ";
+  private final String BETWEEN = " between ? and ?";
+  private final String DELIMITER = ",";
+  private final String EQUAL = " = ?";
+  private final String LIKE = " like ?";
+
+  private final String VALUES = "values";
+  private final String QUERY = "query";
 
   private final String DATE = "date";
   private final String WHEATHER = "wheather";
@@ -46,37 +60,31 @@ public class DiaryRepositoryImpl implements DiaryRepository {
 
   @Override
   public List<Diary> find_by_inner_user_id(Integer inner_user_id) {
-    List<Map<String, Object>> list = jdbcTemplate.queryForList(
-      FIND_ALL_BY_INNER_USER_ID, inner_user_id
+    return jdbcTemplate.query(
+      FIND_BY_INNER_USER_ID,
+      new BeanPropertyRowMapper<Diary>(Diary.class),
+      inner_user_id
     );
-
-    return list.stream()
-    .map(DiaryEntity::set_result)
-    .map(j -> j.get_domain_instance())
-    .collect(Collectors.toList());
   }
 
   @Override
   public Diary find_by_diary_id(Integer diary_id) {
-    Map<String, Object> result = jdbcTemplate.queryForMap(
-      FIND_BY_DIARY_ID, diary_id
+    return jdbcTemplate.queryForObject(
+      FIND_BY_DIARY_ID,
+      new BeanPropertyRowMapper<Diary>(Diary.class),
+      diary_id
     );
-
-    return DiaryEntity.set_result(result)
-    .get_domain_instance();
   }
 
   @Override
   public List<Diary> find_by_multi_condition(Diary diary, Diary end) {
-    String update_part = create_search(diary, end);
+    Map<String, String[]> sqls = get_select_sql(diary, end);
 
-    String query = INNER_JOIN + " where inner_user_id = " +  diary.getInner_user_id() + update_part;
-
-    List<Map<String, Object>> result = jdbcTemplate.queryForList(query);
-    
-    return result.stream().map(DiaryEntity::set_result)
-    .map(r -> r.get_domain_instance())
-    .collect(Collectors.toCollection(ArrayList::new));
+    return jdbcTemplate.query(
+      String.join(AND, sqls.get(QUERY)),
+      new BeanPropertyRowMapper<Diary>(Diary.class),
+      (Object[])sqls.get(VALUES)
+    );
   }
 
   @Override
@@ -86,7 +94,7 @@ public class DiaryRepositoryImpl implements DiaryRepository {
     );
 
     int diary_id = (
-      (BigInteger) jdbcTemplate.queryForMap("select last_insert_id()").get("last_insert_id()")
+      (BigInteger) jdbcTemplate.queryForMap(SELECT_LAST_INSERT_ID).get(LAST_INSERT_ID)
     ).intValue();
 
     jdbcTemplate.update(
@@ -98,28 +106,16 @@ public class DiaryRepositoryImpl implements DiaryRepository {
       diary.getText()
     );
 
-    Map<String, Object> result2 = jdbcTemplate.queryForMap(
-      FIND_BY_DIARY_ID, diary_id
-    );
-
-    return DiaryEntity.set_result(result2)
-    .get_domain_instance();
+    return find_by_diary_id(diary_id);
   }
 
   @Override
   public Diary update(Diary diary) {
-    String update_part = create_update(diary);
+    Map<String, String[]> sqls = get_update_sql(diary);
+    String query = UPDATE_SET + String.join(DELIMITER, sqls.get(QUERY)) + WHERE_DIARY_ID + EQUAL;
+    jdbcTemplate.update(query, (Object[]) sqls.get(VALUES));
 
-    String query = "update diary set " + update_part + " where diary_id = " + diary.getDiary_id();
-
-    jdbcTemplate.update(query);
-    Map<String, Object> result = jdbcTemplate.queryForMap(
-      FIND_BY_DIARY_ID, diary.getDiary_id()
-    );
-    
-    Diary temp = DiaryEntity.set_result(result).get_domain_instance();
-
-    return temp;
+    return find_by_diary_id(diary.getDiary_id());
   }
 
   @Override
@@ -127,43 +123,75 @@ public class DiaryRepositoryImpl implements DiaryRepository {
     jdbcTemplate.update(DELETE, diary_id);
   }
 
-  private String create_update(Diary diary) {
-    String result = "";
+  private Map<String, String[]> get_update_sql(Diary diary) {
+    Map<String, String[]> result = new HashMap<>();
+
+    List<String> query = new ArrayList<>();
+    List<String> values = new ArrayList<>();
 
     if (diary.getDate() != null) {
-      result += DATE + "='" + diary.getDate() + "'";
+      query.add(DATE + EQUAL);
+      values.add(diary.getDate().toString());
     }
 
     if (diary.getWheather() != null) {
-      result += (result.length() != 0 ? ", " : "") +  WHEATHER + "=" + diary.getWheather();
+      query.add(WHEATHER + EQUAL);
+      values.add(diary.getWheather().toString());
     }
 
     if (diary.getFeeling() != null) {
-      result += (result.length() != 0 ? ", " : "") + FEELING + "=" + diary.getFeeling();
+      query.add(FEELING + EQUAL);
+      values.add(diary.getFeeling().toString());
     }
 
     if (diary.getText() != null) {
-      result += (result.length() != 0 ? ", " : "") + TEXT + "='" + diary.getText() + "'";
+      query.add(TEXT + EQUAL);
+      values.add(diary.getText());
     }
+
+    values.add(diary.getDiary_id().toString());
+    result.put(QUERY, query.toArray(new String[0]));
+    result.put(VALUES, values.toArray(new String[0]));
 
     return result;
   }
 
-  private String create_search(Diary diary, Diary end) {
-    String result = "";
+  private Map<String, String[]> get_select_sql(Diary diary, Diary end) {
+    Map<String, String[]> result = new HashMap<>();
+
+    List<String> query = new ArrayList<>(); 
+    List<String> values = new ArrayList<>();
+
+    query.add(FIND_BY_INNER_USER_ID);
+    values.add(diary.getInner_user_id().toString());
 
     if (diary.getDate() != null) {
-      result += " and " +  DATE + " between '" + diary.getDate() + "' and '" + end.getDate() + "'";
+      values.add(diary.getDate().toString());
+      values.add(end.getDate().toString());
+      query.add(DATE + BETWEEN);
     }
     if (diary.getWheather() != null) {
-      result += " and " + WHEATHER + "=" + diary.getWheather();
+      values.add(diary.getWheather().toString());
+      query.add(WHEATHER + EQUAL);
     }
     if (diary.getFeeling() != null) {
-      result += " and " + FEELING + "=" + diary.getFeeling();
+      values.add(diary.getFeeling().toString());
+      query.add(FEELING + EQUAL);
     }
     if (diary.getText() != null) {
-      result += " and " + TEXT +  " like '%" + diary.getText() + "%'"; 
+      values.add("%" + escape(diary.getText()) + "%");
+      query.add(TEXT + LIKE);
     }
+
+    result.put(VALUES, values.toArray(new String[0]));
+    result.put(QUERY, query.toArray(new String[0]));
+
     return result;
+  }
+
+  private String escape(String text) {
+    return text.replace("\\", "\\\\")
+    .replace("_", "\\_")
+    .replace("%", "\\%");
   }
 }
