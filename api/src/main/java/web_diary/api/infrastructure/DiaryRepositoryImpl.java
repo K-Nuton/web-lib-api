@@ -2,6 +2,7 @@ package web_diary.api.infrastructure;
 
 import web_diary.api.domain.exception.DataDuplicationException;
 import web_diary.api.domain.exception.NotFoundException;
+import web_diary.api.domain.model.Diaries;
 import web_diary.api.domain.model.Diary;
 import web_diary.api.domain.repository.DiaryRepository;
 
@@ -70,7 +71,7 @@ public class DiaryRepositoryImpl implements DiaryRepository {
   private final String NOT_FOUND_BY_CONDITION = "There are no diaries with requested conditions.";
 
   @Override
-  public List<Diary> find_by_inner_user_id(Integer inner_user_id) {
+  public Diaries find_by_inner_user_id(Integer inner_user_id) {
     List<Diary> result = jdbcTemplate.query(
       FIND_BY_INNER_USER_ID,
       MAPPER,
@@ -80,7 +81,7 @@ public class DiaryRepositoryImpl implements DiaryRepository {
     if (result.size() == 0) 
       throw new NotFoundException(NO_DIARY.replace(REPLACE, inner_user_id.toString()));
     
-    return result;
+    return Diaries.builder().diaries(result).build();
   }
 
   @Override
@@ -97,7 +98,7 @@ public class DiaryRepositoryImpl implements DiaryRepository {
   }
 
   @Override
-  public List<Diary> find_by_multi_condition(Diary diary, Diary end) {
+  public Diaries find_by_multi_condition(Diary diary, Diary end) {
     Map<String, String[]> sqls = get_select_sql(diary, end);
 
     List<Diary> result = jdbcTemplate.query(
@@ -109,7 +110,7 @@ public class DiaryRepositoryImpl implements DiaryRepository {
     if (result.size() == 0)
       throw new NotFoundException(NOT_FOUND_BY_CONDITION);
 
-    return result;
+    return Diaries.builder().diaries(result).build();
   }
 
   @Override

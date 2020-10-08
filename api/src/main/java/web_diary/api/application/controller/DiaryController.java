@@ -6,10 +6,9 @@ import lombok.RequiredArgsConstructor;
 import web_diary.api.application.resource.input_body.DiaryBody;
 import web_diary.api.application.resource.input_body.DiaryUpdateBody;
 import web_diary.api.domain.exception.InvalidJsonValueException;
+import web_diary.api.domain.model.Diaries;
 import web_diary.api.domain.model.Diary;
 import web_diary.api.domain.service.DiaryService;
-
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +31,7 @@ public class DiaryController {
 
   @PostMapping("{inner_user_id}") 
   @ResponseStatus(HttpStatus.OK)
-  public List<Diary> get_all_diary(@PathVariable("inner_user_id") Integer inner_user_id) {
+  public Diaries get_all_diary(@PathVariable("inner_user_id") Integer inner_user_id) {
     return this.diaryService.find_by_inner_user_id(inner_user_id);
   }
 

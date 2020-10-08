@@ -1,7 +1,5 @@
 package web_diary.api.application.controller;
 
-import java.util.List;
-
 import org.springframework.validation.BindingResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -15,7 +13,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import web_diary.api.application.resource.input_body.SearchBody;
 import web_diary.api.domain.exception.InvalidJsonValueException;
-import web_diary.api.domain.model.Diary;
+import web_diary.api.domain.model.Diaries;
 import web_diary.api.domain.service.DiaryService;
 
 @RestController
@@ -28,7 +26,7 @@ public class SearchController {
 
   @PostMapping()
   @ResponseStatus(HttpStatus.OK)
-  public List<Diary> search(@RequestBody @Validated SearchBody searchBody, BindingResult result) {
+  public Diaries search(@RequestBody @Validated SearchBody searchBody, BindingResult result) {
     if (result.hasErrors())
       throw InvalidJsonValueException.getInstance(result);
     
