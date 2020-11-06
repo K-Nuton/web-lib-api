@@ -40,8 +40,8 @@ public class UserRepositoryImpl implements UserRepository {
                                 "where user.user_id = ?";
   
   private final String REPLACE = "%%";
-  private final String DUPLICATED = "user_id: %% already exists";
-  private final String NOT_FOUND = "There is no user related to user_id: %%.";
+  private final String DUPLICATED = "user_id: "+REPLACE+" already exists";
+  private final String NOT_FOUND = "There is no user related to user_id: "+REPLACE+".";
   
   @Override
   public User insert(User user) {

@@ -66,8 +66,8 @@ public class DiaryRepositoryImpl implements DiaryRepository {
   private final String TEXT = "text"; 
 
   private final String REPLACE = "%%";
-  private final String NO_DIARY = "user: %% has no diary";
-  private final String NOT_FOUND = "There is no diary related to diary_id: %%.";
+  private final String NO_DIARY = "user: "+REPLACE+" has no diary";
+  private final String NOT_FOUND = "There is no diary related to diary_id: "+REPLACE+".";
   private final String NOT_FOUND_BY_CONDITION = "There are no diaries with requested conditions.";
 
   @Override
